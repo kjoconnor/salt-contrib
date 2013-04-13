@@ -1,5 +1,5 @@
-salt-contrib
-============
+salt-contrib-aws
+================
 
 My custom Salt grains/modules/etc.
 
