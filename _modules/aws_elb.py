@@ -43,6 +43,23 @@ def present(name, instance_id=None):
         log.debug(traceback.format_exc())
         return False
 
+    # If we have an availability_zone grain available, make sure this 
+    # instance's zone is in the ELB.  If it's not available, leave it up
+    # to the user to figure out for now.
+    try:
+        if __grains__['availability_zone'] not in elb.availability_zones:
+            try:
+                log.debug("Enabling AZ: %s" % __grains__['availability_zone'])
+                elb.enable_zones([__grains__['availability_zone']])
+            except Exception:
+                import traceback
+                log.debug("Error enabling zone %s for instance %s", 
+                    __grains__['availability_zone'],
+                    instance_id)
+                log.debug(traceback.format_exc())
+    except KeyError:
+        log.debug("Didn't find an AZ grain to add to the ELB.")
+
     log.debug("Successfully added instance %s to ELB %s",
         instance_id,
         name
